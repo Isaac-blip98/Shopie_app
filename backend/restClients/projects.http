@@ -35,3 +35,5 @@ Authorization: Bearer {{admin_token}}
 ### Delete Product (Admin Only)
 DELETE http://localhost:3000/products/6d97f9d9-bd5e-45a7-8347-35eddbb39046
 Authorization: Bearer {{admin_token}}
+
+ http://local

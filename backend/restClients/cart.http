@@ -1,0 +1,29 @@
+@JWT_TOKEN =  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTA2NTkzNC00ZDE0LTQ0NTgtODM0MS02YzQxNDNiN2MwYWQiLCJlbWFpbCI6ImN1c3RvbWVyQHNob3BpZS5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NTAzMzc4MTQsImV4cCI6MTc1MDk0MjYxNH0.D9upl54Iz9EjnLYNV-gvzALZ838hIAXAF0M4UpoP0yM
+@PRODUCT_ID = ac78b49a-4946-4d93-9a2d-71353c3be99d
+
+### Get items in the current user's cart
+GET http://localhost:3000/cart
+Authorization: Bearer {{JWT_TOKEN}}
+
+### Add item to cart
+POST http://localhost:3000/cart
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+
+{
+  "productId": "{{PRODUCT_ID}}",
+  "quantity": 2
+}
+
+### Update quantity of a cart item
+PATCH http://localhost:3000/cart/b450e64a-da5b-40b4-96e1-16d031609ad3
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+
+{
+  "quantity": 5
+}
+
+### Remove all item from cart
+DELETE http://localhost:3000/cart/b450e64a-da5b-40b4-96e1-16d031609ad3
+Authorization: Bearer {{JWT_TOKEN}}

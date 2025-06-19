@@ -56,4 +56,5 @@ export class ProductsController {
   delete(@Param('id') id: string): Promise<ProductResponse> {
     return this.productService.deleteProduct(id);
   }
+  
 }

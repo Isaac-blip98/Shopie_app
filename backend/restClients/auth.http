@@ -1,0 +1,18 @@
+###Register
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "shopper@shopie.com",
+  "name": "Shopper",
+  "password": "customer123"
+}
+
+### Login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@shopie.com",
+  "password": "customer123"
+}

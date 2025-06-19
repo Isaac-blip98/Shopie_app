@@ -1,0 +1,37 @@
+@admin_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MTczNjhmZS01NTkzLTQyZGQtOTBmNi0zMzYxZDVlYWY4NWMiLCJlbWFpbCI6ImFkbWluQHNob3BpZS5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTAzMjMxNzIsImV4cCI6MTc1MDkyNzk3Mn0.0tyUs3rzQOHZGAWE_QOgKRVlCcuPlwmFKsTJr37XNpA
+@customer_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNTA2NTkzNC00ZDE0LTQ0NTgtODM0MS02YzQxNDNiN2MwYWQiLCJlbWFpbCI6ImN1c3RvbWVyQHNob3BpZS5jb20iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NTAzMjMyMzMsImV4cCI6MTc1MDkyODAzM30.-y8Napi9-Q_pBQHtKWVarEya4DIANBN9dirqu7XMB3g
+
+### Get All Products (Any Authenticated User)
+GET http://localhost:3000/products
+
+
+### Get One Product by ID (Replace :id with actual product ID)
+GET http://localhost:3000/products/6d97f9d9-bd5e-45a7-8347-35eddbb39046
+
+
+### Create Product (Admin Only)
+POST http://localhost:3000/products
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "name": "Wireless Earbuds",
+  "description": "Noise-cancelling wireless earbuds.",
+  "price": 49.99,
+  "image": "https://example.com/earbuds.jpg",
+  "quantity": 25
+}
+
+### Update Product (Admin Only)
+PATCH http://localhost:3000/products/6d97f9d9-bd5e-45a7-8347-35eddbb39046
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "price": 45.00,
+  "quantity": 30
+}
+
+### Delete Product (Admin Only)
+DELETE http://localhost:3000/products/6d97f9d9-bd5e-45a7-8347-35eddbb39046
+Authorization: Bearer {{admin_token}}

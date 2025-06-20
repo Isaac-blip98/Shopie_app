@@ -3,9 +3,9 @@ POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
-  "email": "shopper@shopie.com",
-  "name": "Shopper",
-  "password": "customer123"
+  "email": "kimingipeter318@gamily.com",
+  "name": "Peter",
+  "password": "peter123"
 }
 
 ### Login
@@ -15,4 +15,21 @@ Content-Type: application/json
 {
   "email": "customer@shopie.com",
   "password": "customer123"
+}
+
+### forgot password
+POST  http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "johndoe@gmail.com"
+}
+
+
+### reset password
+POST  http://localhost:3000/auth/reset-password/dce5911e927f83d41a8ec54ed356f31bbf55a33d4a20bb6f21b29dd64d321d44
+Content-Type: application/json
+
+{
+  "newPassword": "doe123!"
 }

@@ -50,7 +50,7 @@ export class CartService {
     const updatedProductQty = product.quantity - quantity;
 
     if (existingItem) {
-      // Update cart item and reduce stock
+
       await this.prisma.product.update({
         where: { id: productId },
         data: { quantity: updatedProductQty },
@@ -63,7 +63,6 @@ export class CartService {
       });
     }
 
-    // Create new cart item and reduce stock
     await this.prisma.product.update({
       where: { id: productId },
       data: { quantity: updatedProductQty },
@@ -108,22 +107,31 @@ export class CartService {
     });
   }
 
-  async removeCartItem(user: JwtPayload, cartItemId: string): Promise<void> {
-    const item = await this.prisma.cartItem.findUnique({
+async removeCartItem(user: JwtPayload, cartItemId: string): Promise<void> {
+  const item = await this.prisma.cartItem.findUnique({
+    where: { id: cartItemId },
+    include: { cart: true, product: true },
+  });
+
+  if (!item) throw new NotFoundException('Cart item not found');
+  if (item.cart.userId !== user.userId)
+    throw new UnauthorizedException('Not your cart item');
+
+  await this.prisma.product.update({
+    where: { id: item.product.id },
+    data: { quantity: item.product.quantity + 1 },
+  });
+
+  if (item.quantity > 1) {
+    await this.prisma.cartItem.update({
       where: { id: cartItemId },
-      include: { cart: true, product: true },
+      data: { quantity: item.quantity - 1 },
     });
-
-    if (!item) throw new NotFoundException('Cart item not found');
-    if (item.cart.userId !== user.userId) throw new UnauthorizedException('Not your cart item');
-
-    await this.prisma.product.update({
-      where: { id: item.product.id },
-      data: { quantity: item.product.quantity + item.quantity },
-    });
+  } else {
 
     await this.prisma.cartItem.delete({
       where: { id: cartItemId },
     });
   }
+}
 }

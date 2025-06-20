@@ -15,12 +15,21 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "name": "Wireless Earbuds",
-  "description": "Noise-cancelling wireless earbuds.",
-  "price": 49.99,
+  "name": "Gaming pad",
+  "description": "Touch friendly and easy to navigate",
+  "price": 200.00,
   "image": "https://example.com/earbuds.jpg",
-  "quantity": 25
+  "quantity": 5
 }
+
+### search product by name/description
+GET http://localhost:3000/products/search?q=Mouse
+
+### filtering using price
+GET http://localhost:3000/products/filter?minPrice=40&maxPrice=290
+
+### filtering using price
+GET http://localhost:3000/products/filter?minQty=5&maxQty=20
 
 ### Update Product (Admin Only)
 PATCH http://localhost:3000/products/6d97f9d9-bd5e-45a7-8347-35eddbb39046
@@ -36,4 +45,3 @@ Authorization: Bearer {{admin_token}}
 DELETE http://localhost:3000/products/6d97f9d9-bd5e-45a7-8347-35eddbb39046
 Authorization: Bearer {{admin_token}}
 
- http://local

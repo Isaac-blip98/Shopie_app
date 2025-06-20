@@ -16,7 +16,9 @@ import { JwtPayload } from 'src/auth/interfaces/auth.jwtpayload.interface';
 import { AddToCartDto } from './dtos/add-to-cart.dto';
 import { UpdateCartItemDto } from './dtos/update-cart-item.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guards';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @UseGuards(JwtAuthGuard)
 @Controller('cart')
 export class CartController {

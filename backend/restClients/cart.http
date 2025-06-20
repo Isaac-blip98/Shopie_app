@@ -25,5 +25,5 @@ Authorization: Bearer {{JWT_TOKEN}}
 }
 
 ### Remove all item from cart
-DELETE http://localhost:3000/cart/b450e64a-da5b-40b4-96e1-16d031609ad3
+DELETE http://localhost:3000/cart/40ea2377-106d-4654-8c72-7cc955623c24
 Authorization: Bearer {{JWT_TOKEN}}

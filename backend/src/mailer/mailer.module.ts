@@ -20,7 +20,8 @@ import { join } from 'path';
         from: '"Shopie" <no-reply@shopie.com>',
       },
       template: {
-        dir: join(__dirname, 'templates'), 
+        dir: join(process.cwd(), 'src', 'mailer', 'templates'),
+        // dir: join(__dirname, 'templates'), 
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,

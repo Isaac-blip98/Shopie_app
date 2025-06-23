@@ -9,19 +9,19 @@ export class MailerService {
     await this.mailerService.sendMail({
       to,
       subject: 'Welcome to Shopie!',
-      template: './welcome',
+      template: 'welcome',
       context: { name },
     });
   }
 
-  async sendPasswordResetEmail(to: string, token: string) {
+  async sendVerificationCodeEmail(to: string, code: string, name: string) {
     await this.mailerService.sendMail({
       to,
-      subject: 'Reset Your Shopie Password',
-      template: './reset-password',
+      subject: 'Your Shopie Password Reset Code',
+      template: 'reset-password',
       context: {
-        token,
-        resetUrl: `https://yourfrontend.com/reset-password?token=${token}`,
+        name,
+        code,
       },
     });
   }

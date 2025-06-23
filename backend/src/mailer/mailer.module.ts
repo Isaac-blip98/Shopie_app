@@ -21,7 +21,6 @@ import { join } from 'path';
       },
       template: {
         dir: join(process.cwd(), 'src', 'mailer', 'templates'),
-        // dir: join(__dirname, 'templates'), 
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,

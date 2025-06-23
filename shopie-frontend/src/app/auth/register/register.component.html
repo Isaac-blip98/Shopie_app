@@ -1,0 +1,29 @@
+<div class="register-container">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <h2>Register</h2>
+
+    <div>
+      <label>Name:</label>
+      <input type="text" formControlName="name" />
+    </div>
+
+    <div>
+      <label>Email:</label>
+      <input type="email" formControlName="email" />
+    </div>
+
+    <div>
+      <label>Password:</label>
+      <input type="password" formControlName="password" />
+    </div>
+
+    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+
+    <p *ngIf="error" style="color: red;">{{ error }}</p>
+  </form>
+
+  <p class="login-link">
+    Already have an account?
+    <a routerLink="/auth/login">Log in</a>
+  </p>
+</div>

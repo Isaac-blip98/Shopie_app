@@ -1,5 +1,5 @@
 import { addMinutes } from 'date-fns';
-import { MailerService } from '@nestjs-modules/mailer';
+import { MailerService } from 'src/mailer/mailer.service';
 import {
   Injectable,
   UnauthorizedException,
@@ -23,7 +23,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<{ message: string; user: UserResponseDto }> {
+  async register(
+    dto: RegisterDto,
+  ): Promise<{ message: string; user: UserResponseDto }> {
     const { email, name, password } = dto;
 
     const existing = await this.prisma.user.findUnique({ where: { email } });
@@ -42,21 +44,12 @@ export class AuthService {
       },
     });
 
-  //   try{
-  //   await this.mailerService.sendMail({
-  //     to: email,
-  //     subject: 'Welcome to Shopie!',
-  //     template: './welcome', 
-  //     context: {
-  //       name,
-  //     },
-  //   });
-  //   console.log(`welcome email sent to ${user.email}`);
-  // } catch(err) {
-  //   console.error(`email send failed:`, err);
-    
-  // }
-    
+    try {
+      await this.mailerService.sendWelcomeEmail(email, name);
+      console.log(`Welcome email sent to ${user.email}`);
+    } catch (err) {
+      console.error(`Email send failed:`, err);
+    }
 
     const response: UserResponseDto = {
       id: user.id,
@@ -72,7 +65,9 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginDto): Promise<{ access_token: string; user: UserResponseDto }> {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ access_token: string; user: UserResponseDto }> {
     const { email, password } = dto;
 
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -102,55 +97,55 @@ export class AuthService {
   }
 
   async forgotPassword(email: string): Promise<{ message: string }> {
-  const user = await this.prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    throw new NotFoundException('No account with that email found.');
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new NotFoundException('No account with that email found.');
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); 
+    const expiresAt = addMinutes(new Date(), 15);
+
+    await this.prisma.passwordResetToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await this.prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        token: code,
+        expiresAt,
+      },
+    });
+
+    await this.mailerService.sendVerificationCodeEmail(
+      user.email,
+      code,
+      user.name,
+    );
+
+    return { message: 'Verification code sent to your email.' };
   }
 
-  const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = addMinutes(new Date(), 15); // valid for 15 minutes
+  async resetPassword(
+    code: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    const resetToken = await this.prisma.passwordResetToken.findUnique({
+      where: { token: code },
+      include: { user: true },
+    });
 
-  await this.prisma.passwordResetToken.create({
-    data: {
-      userId: user.id,
-      token,
-      expiresAt,
-    },
-  });
+    if (!resetToken || resetToken.expiresAt < new Date()) {
+      throw new BadRequestException('Invalid or expired code.');
+    }
 
-  // await this.mailerService.sendMail({
-  //   to: user.email,
-  //   subject: 'Reset your password',
-  //   template: './reset-password', // relative to mailer/templates
-  //   context: {
-  //     name: user.name,
-  //     resetLink: `http://localhost:3000/reset-password/${token}`,
-  //   },
-  // });
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  return { message: 'Reset password link sent to your email.' };
-}
+    await this.prisma.user.update({
+      where: { id: resetToken.userId },
+      data: { password: hashedPassword },
+    });
 
-async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
-  const resetToken = await this.prisma.passwordResetToken.findUnique({
-    where: { token },
-    include: { user: true },
-  });
+    await this.prisma.passwordResetToken.delete({ where: { token: code } });
 
-  if (!resetToken || resetToken.expiresAt < new Date()) {
-    throw new BadRequestException('Invalid or expired token.');
+    return { message: 'Password has been reset successfully.' };
   }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  await this.prisma.user.update({
-    where: { id: resetToken.userId },
-    data: { password: hashedPassword },
-  });
-
-  await this.prisma.passwordResetToken.delete({ where: { token } });
-
-  return { message: 'Password has been reset successfully.' };
-}
-
 }

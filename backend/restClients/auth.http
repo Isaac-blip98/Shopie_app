@@ -3,9 +3,9 @@ POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
-  "email": "kimingipeter318@gamily.com",
-  "name": "Peter",
-  "password": "peter123"
+  "email": "tribianijoey5100@gmail.com",
+  "name": "Joey",
+  "password": "joey123"
 }
 
 ### Login
@@ -22,8 +22,12 @@ POST  http://localhost:3000/auth/forgot-password
 Content-Type: application/json
 
 {
-  "email": "johndoe@gmail.com"
+  "email": "tobymaguire324@gmail.com"
 }
+
+# {
+#   "email": "johndoe@gmail.com"
+# }
 
 
 ### reset password
@@ -31,5 +35,9 @@ POST  http://localhost:3000/auth/reset-password/dce5911e927f83d41a8ec54ed356f31b
 Content-Type: application/json
 
 {
-  "newPassword": "doe123!"
+  "newPassword": "toby22"
 }
+
+# {
+#   "newPassword": "doe123!"
+# }

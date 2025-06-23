@@ -1,0 +1,19 @@
+<div class="login-container">
+  <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
+    <h2>Login to Shopie</h2>
+
+    <label>Email</label>
+    <input type="email" formControlName="email" placeholder="Enter your email" />
+
+    <label>Password</label>
+    <input type="password" formControlName="password" placeholder="Enter your password" />
+
+    <button type="submit" [disabled]="loginForm.invalid">Login</button>
+
+    <p class="forgot-password" (click)="goToForgotPassword()">Forgot password?</p>
+  </form>
+  
+  <p>Don't have an account? 
+  <a routerLink="/auth/register">Register</a>
+</p>
+</div>

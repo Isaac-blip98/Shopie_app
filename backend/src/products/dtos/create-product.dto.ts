@@ -14,7 +14,7 @@ export class CreateProductDto {
   price: number;
 
   @IsUrl()
-  image: string;
+  image?: string;
 
   @IsNumber()
   @Min(0)

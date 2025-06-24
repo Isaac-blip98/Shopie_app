@@ -10,13 +10,16 @@ import { AuthService } from '../../shared/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './shop.component.html',
-  styleUrls: ['./shop.component.css']
+  styleUrls: ['./shop.component.css'],
 })
 export class ShopComponent implements OnInit {
+  userName: string = 'Customer';
+  userInitial: string = 'C';
+
   products: any[] = [];
   filteredProducts: any[] = [];
   cartItems: any[] = [];
-  
+
   searchTerm: string = '';
   sortBy: string = 'name';
   viewMode: 'grid' | 'list' = 'grid';
@@ -29,6 +32,10 @@ export class ShopComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user?.name) {
+      this.userName = user.name;
+    }
     this.loadProducts();
     this.loadCartItems();
   }
@@ -37,12 +44,12 @@ export class ShopComponent implements OnInit {
     this.isLoading = true;
     this.productService.getAll().subscribe({
       next: (data) => {
-        this.products = data.map(product => ({
+        this.products = data.map((product) => ({
           ...product,
-          createdAt: product.createdAt || new Date()
+          createdAt: product.createdAt || new Date(),
         }));
         this.filteredProducts = [...this.products];
-        this.onSort(); 
+        this.onSort();
         this.isLoading = false;
       },
       error: (error) => {
@@ -50,12 +57,11 @@ export class ShopComponent implements OnInit {
         this.isLoading = false;
 
         this.filteredProducts = [...this.products];
-      }
+      },
     });
   }
 
   loadCartItems(): void {
-
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       this.cartItems = JSON.parse(savedCart);
@@ -72,13 +78,20 @@ export class ShopComponent implements OnInit {
         this.filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'price-low':
-        this.filteredProducts.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        this.filteredProducts.sort(
+          (a, b) => parseFloat(a.price) - parseFloat(b.price)
+        );
         break;
       case 'price-high':
-        this.filteredProducts.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+        this.filteredProducts.sort(
+          (a, b) => parseFloat(b.price) - parseFloat(a.price)
+        );
         break;
       case 'newest':
-        this.filteredProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        this.filteredProducts.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
         break;
     }
   }
@@ -88,9 +101,11 @@ export class ShopComponent implements OnInit {
       this.filteredProducts = [...this.products];
     } else {
       const searchLower = this.searchTerm.toLowerCase();
-      this.filteredProducts = this.products.filter(product =>
-        product.name.toLowerCase().includes(searchLower) ||
-        (product.description && product.description.toLowerCase().includes(searchLower))
+      this.filteredProducts = this.products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchLower) ||
+          (product.description &&
+            product.description.toLowerCase().includes(searchLower))
       );
     }
     this.onSort();
@@ -116,7 +131,6 @@ export class ShopComponent implements OnInit {
   }
 
   isNewProduct(product: any): boolean {
-
     const createdAt = new Date(product.createdAt);
     const now = new Date();
     const diffDays = (now.getTime() - createdAt.getTime()) / (1000 * 3600 * 24);
@@ -125,7 +139,9 @@ export class ShopComponent implements OnInit {
 
   getDescriptionPreview(description: string): string {
     if (!description) return '';
-    return description.length > 80 ? description.slice(0, 80) + '...' : description;
+    return description.length > 80
+      ? description.slice(0, 80) + '...'
+      : description;
   }
 
   addToCart(product: any): void {
@@ -138,7 +154,10 @@ export class ShopComponent implements OnInit {
   }
 
   getCartTotal(): number {
-    return this.cartItems.reduce((total, item) => total + parseFloat(item.price), 0);
+    return this.cartItems.reduce(
+      (total, item) => total + parseFloat(item.price),
+      0
+    );
   }
 
   viewCart(): void {
@@ -146,7 +165,7 @@ export class ShopComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout?.(); 
+    this.authService.logout?.();
     localStorage.removeItem('access_token');
     this.router.navigate(['/auth/login']);
   }

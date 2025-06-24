@@ -1,188 +1,197 @@
-<div class="shop-container">
-
-  <header class="shop-header">
-    <div class="header-content">
-      <div class="brand-section">
-        <h1 class="brand-name">
-          <span class="brand-icon">🛍️</span>
-          Shopie
-        </h1>
-        <p class="welcome-text">Discover amazing products just for you!</p>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+  <!-- Header -->
+<header
+  class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+  <div>
+    <h1 class="text-2xl font-bold text-yellow-500 tracking-wide">Shopie</h1>
+    <p class="text-sm text-gray-700">
+      Discover amazing products just for you!
+    </p>
+  </div>
+  <div class="flex items-center gap-5">
+    <div class="flex items-center gap-3">
+      <div
+        class="w-10 h-10 rounded-full bg-yellow-400 text-white flex items-center justify-center
+               font-semibold uppercase shadow">
+        {{ userInitial }}
       </div>
-      
-      <div class="user-section">
-        <div class="user-info">
-          <div class="user-avatar">
-            <span class="user-icon">👤</span>
-          </div>
-          <div class="user-details">
-            <span class="user-greeting">Welcome back!</span>
-            <span class="user-type">Customer Dashboard</span>
-          </div>
+      <div class="leading-tight">
+        <div class="text-sm font-medium text-gray-800">
+          Welcome&nbsp;back! {{userName}}
         </div>
-        
-        <button class="logout-btn" (click)="logout()">
-          <span class="logout-icon">🚪</span>
-          Logout
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <section class="search-section">
-    <div class="search-container">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          placeholder="Search products by name or description..." 
-          [(ngModel)]="searchTerm"
-          (input)="onSearch()"
-          class="search-input"
-        >
-        <button 
-          class="clear-search" 
-          *ngIf="searchTerm" 
-          (click)="clearSearch()"
-          title="Clear search"
-        >
-          ✕
-        </button>
-      </div>
-      
-      <div class="filter-controls">
-        <div class="sort-control">
-          <label for="sortBy">Sort by:</label>
-          <select id="sortBy" [(ngModel)]="sortBy" (change)="onSort()" class="sort-select">
-            <option value="name">Name</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="newest">Newest First</option>
-          </select>
-        </div>
-        
-        <div class="view-toggle">
-          <button 
-            class="view-btn" 
-            [class.active]="viewMode === 'grid'"
-            (click)="setViewMode('grid')"
-            title="Grid View"
-          >
-            ⊞
-          </button>
-          <button 
-            class="view-btn" 
-            [class.active]="viewMode === 'list'"
-            (click)="setViewMode('list')"
-            title="List View"
-          >
-            ☰
-          </button>
+        <div class="text-xs text-gray-500">
+          Customer&nbsp;Dashboard
         </div>
       </div>
     </div>
-    
-    <div class="results-info" *ngIf="searchTerm || filteredProducts.length !== products.length">
-      <span class="results-count">
-        Showing {{ filteredProducts.length }} of {{ products.length }} products
-        <span *ngIf="searchTerm" class="search-term">for "{{ searchTerm }}"</span>
-      </span>
-      <button class="clear-filters" (click)="clearAllFilters()" *ngIf="searchTerm">
-        Clear all filters
-      </button>
-    </div>
-  </section>
 
-  <section class="products-section">
-    <div class="section-header">
-      <h2 class="section-title">
-        <span class="title-icon">📦</span>
-        Our Products
-      </h2>
-      <div class="product-count">
-        {{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'Product' : 'Products' }}
-      </div>
-    </div>
+    <button
+      type="button"
+      (click)="logout()"
+      class="px-4 py-2 bg-gray-900 text-white rounded
+             hover:bg-gray-700 transition text-sm font-medium">
+      Logout
+    </button>
+  </div>
+</header>
 
-    <div class="loading-state" *ngIf="isLoading">
-      <div class="loading-spinner"></div>
-      <p>Loading amazing products...</p>
-    </div>
 
-    <div 
-      class="products-container" 
-      [class.grid-view]="viewMode === 'grid'"
-      [class.list-view]="viewMode === 'list'"
-      *ngIf="!isLoading"
-    >
-      <div 
-        class="product-card" 
-        *ngFor="let product of filteredProducts; trackBy: trackByProduct"
-        [attr.data-product-id]="product.id"
+  <!-- Search & Filter -->
+<section class="p-6 space-y-4 bg-white text-gray-800">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Search Input -->
+    <div class="flex flex-1 relative">
+      <input
+        type="text"
+        placeholder="Search products..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        class="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
+      />
+      <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+      <button
+        *ngIf="searchTerm"
+        (click)="clearSearch()"
+        class="absolute right-3 top-2.5 text-gray-500 hover:text-red-500"
+        title="Clear search"
       >
-        <div class="product-image">
-          <div class="image-placeholder">
-            <span class="product-icon">📱</span>
-          </div>
-          <div class="product-badge" *ngIf="isNewProduct(product)">New</div>
-        </div>
-        
-        <div class="product-content">
-          <div class="product-header">
-            <h3 class="product-name" [title]="product.name">{{ product.name }}</h3>
-            <div class="product-price">
-              <span class="currency">$</span>
-              <span class="amount">{{ product.price | number:'1.2-2' }}</span>
-            </div>
-          </div>
-          
-          <p class="product-description" [title]="product.description">
-            {{ getDescriptionPreview(product.description) }}
-          </p>
-          
-          <div class="product-actions">
-            <button class="btn btn-primary add-to-cart" (click)="addToCart(product)">
-              <span class="btn-icon">🛒</span>
-              Add to Cart
-            </button>
-            <button class="btn btn-secondary view-details" (click)="viewProduct(product)">
-              <span class="btn-icon">👁️</span>
-              View Details
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="empty-state" *ngIf="!isLoading && filteredProducts.length === 0">
-      <div class="empty-icon">
-        <span *ngIf="searchTerm">🔍</span>
-        <span *ngIf="!searchTerm">📦</span>
-      </div>
-      <h3 *ngIf="searchTerm">No products found</h3>
-      <h3 *ngIf="!searchTerm">No products available</h3>
-      <p *ngIf="searchTerm">
-        Try adjusting your search term or 
-        <button class="link-btn" (click)="clearSearch()">browse all products</button>
-      </p>
-      <p *ngIf="!searchTerm">Check back later for new arrivals!</p>
-    </div>
-  </section>
-
-  <div class="cart-summary" *ngIf="cartItems.length > 0">
-    <div class="cart-content">
-      <div class="cart-info">
-        <span class="cart-icon">🛒</span>
-        <span class="cart-count">{{ cartItems.length }} items in cart</span>
-      </div>
-      <div class="cart-total">
-        <span class="total-label">Total: </span>
-        <span class="total-amount">${{ getCartTotal() | number:'1.2-2' }}</span>
-      </div>
-      <button class="btn btn-success view-cart" (click)="viewCart()">
-        View Cart
+        ✕
       </button>
+    </div>
+
+    <!-- Sort + View Toggle -->
+    <div class="flex items-center gap-4">
+      <label for="sortBy" class="text-sm font-medium text-gray-700">Sort by:</label>
+      <select
+        id="sortBy"
+        [(ngModel)]="sortBy"
+        (change)="onSort()"
+        class="border border-gray-300 rounded-md px-2 py-1 text-sm bg-white text-gray-800"
+      >
+        <option value="name">Name</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="newest">Newest First</option>
+      </select>
+
+      <div class="flex gap-1">
+        <button
+          class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100"
+          [ngClass]="{ 'bg-yellow-400 text-white': viewMode === 'grid' }"
+          (click)="setViewMode('grid')"
+          title="Grid View"
+        >
+          ⊞
+        </button>
+        <button
+          class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100"
+          [ngClass]="{ 'bg-yellow-400 text-white': viewMode === 'list' }"
+          (click)="setViewMode('list')"
+          title="List View"
+        >
+          ☰
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
+  <!-- Filter Feedback -->
+  <div *ngIf="searchTerm || filteredProducts.length !== products.length" class="text-sm flex justify-between text-gray-600">
+    <span>
+      Showing {{ filteredProducts.length }} of {{ products.length }}
+      <span *ngIf="searchTerm">for "{{ searchTerm }}"</span>
+    </span>
+    <button class="text-yellow-600 hover:underline" (click)="clearAllFilters()" *ngIf="searchTerm">
+      Clear all filters
+    </button>
+  </div>
+</section>
+
+  <!-- Products -->
+<section class="px-6 pb-20">
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-10">
+    <div class="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full"></div>
+    <p class="mt-2 text-gray-600 dark:text-gray-300">Loading amazing products...</p>
+  </div>
+
+  <div
+    *ngIf="!isLoading && filteredProducts.length > 0"
+    [ngClass]="{
+      'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6': viewMode === 'grid',
+      'flex flex-col gap-4': viewMode === 'list'
+    }"
+  >
+    <div
+      *ngFor="let product of filteredProducts; trackBy: trackByProduct"
+      class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 shadow-md relative"
+    >
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">{{ product.name }}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-300 truncate">
+            {{ getDescriptionPreview(product.description) }}
+          </p>
+        </div>
+        <div class="text-right">
+          <span class="text-sm text-gray-400">Price</span><br />
+          <span class="text-xl font-bold text-yellow-500">${{ product.price | number: '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="mt-4 flex gap-2">
+        <button
+          class="flex-1 bg-yellow-400 text-gray-900 font-medium py-1 px-4 rounded hover:bg-yellow-500 text-sm"
+          (click)="addToCart(product)"
+        >
+          🛒 Add to Cart
+        </button>
+        <button
+          class="flex-1 bg-gray-900 text-white py-1 px-4 rounded hover:bg-gray-800 text-sm"
+          (click)="viewProduct(product)"
+        >
+          👁️ View
+        </button>
+      </div>
+
+      <div
+        *ngIf="isNewProduct(product)"
+        class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full"
+      >
+        New
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredProducts.length === 0" class="text-center py-10 text-gray-500">
+    <div class="text-4xl mb-4">
+      <span *ngIf="searchTerm">🔍</span>
+      <span *ngIf="!searchTerm">📦</span>
+    </div>
+    <h3 class="text-lg font-medium">
+      {{ searchTerm ? 'No products found' : 'No products available' }}
+    </h3>
+    <p *ngIf="searchTerm">
+      Try adjusting your search or
+      <button class="text-yellow-500 hover:underline" (click)="clearSearch()">browse all products</button>
+    </p>
+    <p *ngIf="!searchTerm">Check back later for new arrivals!</p>
+  </div>
+</section>
+
+  <!-- Cart Summary -->
+  <div
+    *ngIf="cartItems.length > 0"
+    class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md px-6 py-4 flex justify-between items-center"
+  >
+    <div class="flex gap-3 items-center">
+      <span>🛒</span>
+      <span>{{ cartItems.length }} items</span>
+    </div>
+    <div class="text-lg font-bold">
+      Total: ${{ getCartTotal() | number: '1.2-2' }}
+    </div>
+    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="viewCart()">
+      View Cart
+    </button>
+  </div>
+</div>

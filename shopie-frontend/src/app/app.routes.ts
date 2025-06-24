@@ -6,11 +6,11 @@ export const routes: Routes = [
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   },
-  {
-    path: 'admin',
-    loadComponent: () =>
-      import('./admin/admin.component').then((m) => m.AdminDashboardComponent),
-  },
+{
+  path: 'admin',
+  loadChildren: () =>
+    import('./admin/admin.module').then((m) => m.AdminModule),
+},
   {
   path: 'shop',
   loadComponent: () =>

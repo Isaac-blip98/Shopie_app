@@ -32,4 +32,9 @@ export class AuthService {
       newPassword,
     });
   }
+
+    getCurrentUser(): any {
+    const userJson = localStorage.getItem('currentUser');
+    return userJson ? JSON.parse(userJson) : null;
+  }
 }

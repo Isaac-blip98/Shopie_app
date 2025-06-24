@@ -9,6 +9,8 @@ import {
   UseGuards,
   Req,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guards';
@@ -18,11 +20,16 @@ import { Roles } from 'src/common/decorators/roles.decorators';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
 
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productService: ProductsService) {}
+  constructor(
+    private readonly productService: ProductsService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   @Get('search')
   search(@Query('q') query?: string): Promise<ProductResponse[]> {
@@ -61,9 +68,24 @@ export class ProductsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  create(@Body() dto: CreateProductDto, @Req() req): Promise<ProductResponse> {
-    const adminId = req.user?.userId;
-    return this.productService.createProduct({ ...dto, adminId });
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: CreateProductDto,
+    @Req() req: any,
+  ) {
+    const upload = file ? await this.cloudinaryService.uploadImage(file) : null;
+
+    const price = body.price ? parseFloat(body.price as any) : 0;
+    const quantity = body.quantity ? parseInt(body.quantity as any, 10) : 0;
+
+    return this.productService.createProduct({
+      ...body,
+      price,
+      quantity,
+      image: upload?.secure_url || '',
+      adminId: req.user?.userId,
+    });
   }
 
   @Patch(':id')

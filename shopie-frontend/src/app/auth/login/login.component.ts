@@ -26,14 +26,27 @@ export class LoginComponent {
     });
   }
 
-  onSubmit() {
-    if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
-        next: () => this.router.navigate(['/dashboard']),
-        error: (err: any) => (this.error = err.error.message || 'Login failed'),
-      });
-    }
+onSubmit() {
+  if (this.loginForm.valid) {
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        const role = res?.user?.role;
+
+        localStorage.setItem('access_token', res.access_token);
+
+        if (role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else if (role === 'CUSTOMER') {
+          this.router.navigate(['/shop']); 
+        } else {
+          this.error = 'Unknown user role';
+        }
+      },
+      error: (err: any) =>
+        (this.error = err?.error?.message || 'Login failed'),
+    });
   }
+}
 
   goToForgotPassword() {
     this.router.navigate(['/auth/forgot-password']);

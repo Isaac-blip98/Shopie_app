@@ -1,0 +1,188 @@
+<div class="shop-container">
+
+  <header class="shop-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <h1 class="brand-name">
+          <span class="brand-icon">🛍️</span>
+          Shopie
+        </h1>
+        <p class="welcome-text">Discover amazing products just for you!</p>
+      </div>
+      
+      <div class="user-section">
+        <div class="user-info">
+          <div class="user-avatar">
+            <span class="user-icon">👤</span>
+          </div>
+          <div class="user-details">
+            <span class="user-greeting">Welcome back!</span>
+            <span class="user-type">Customer Dashboard</span>
+          </div>
+        </div>
+        
+        <button class="logout-btn" (click)="logout()">
+          <span class="logout-icon">🚪</span>
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="search-section">
+    <div class="search-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          placeholder="Search products by name or description..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          class="search-input"
+        >
+        <button 
+          class="clear-search" 
+          *ngIf="searchTerm" 
+          (click)="clearSearch()"
+          title="Clear search"
+        >
+          ✕
+        </button>
+      </div>
+      
+      <div class="filter-controls">
+        <div class="sort-control">
+          <label for="sortBy">Sort by:</label>
+          <select id="sortBy" [(ngModel)]="sortBy" (change)="onSort()" class="sort-select">
+            <option value="name">Name</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+          </select>
+        </div>
+        
+        <div class="view-toggle">
+          <button 
+            class="view-btn" 
+            [class.active]="viewMode === 'grid'"
+            (click)="setViewMode('grid')"
+            title="Grid View"
+          >
+            ⊞
+          </button>
+          <button 
+            class="view-btn" 
+            [class.active]="viewMode === 'list'"
+            (click)="setViewMode('list')"
+            title="List View"
+          >
+            ☰
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="results-info" *ngIf="searchTerm || filteredProducts.length !== products.length">
+      <span class="results-count">
+        Showing {{ filteredProducts.length }} of {{ products.length }} products
+        <span *ngIf="searchTerm" class="search-term">for "{{ searchTerm }}"</span>
+      </span>
+      <button class="clear-filters" (click)="clearAllFilters()" *ngIf="searchTerm">
+        Clear all filters
+      </button>
+    </div>
+  </section>
+
+  <section class="products-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">📦</span>
+        Our Products
+      </h2>
+      <div class="product-count">
+        {{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'Product' : 'Products' }}
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loading-spinner"></div>
+      <p>Loading amazing products...</p>
+    </div>
+
+    <div 
+      class="products-container" 
+      [class.grid-view]="viewMode === 'grid'"
+      [class.list-view]="viewMode === 'list'"
+      *ngIf="!isLoading"
+    >
+      <div 
+        class="product-card" 
+        *ngFor="let product of filteredProducts; trackBy: trackByProduct"
+        [attr.data-product-id]="product.id"
+      >
+        <div class="product-image">
+          <div class="image-placeholder">
+            <span class="product-icon">📱</span>
+          </div>
+          <div class="product-badge" *ngIf="isNewProduct(product)">New</div>
+        </div>
+        
+        <div class="product-content">
+          <div class="product-header">
+            <h3 class="product-name" [title]="product.name">{{ product.name }}</h3>
+            <div class="product-price">
+              <span class="currency">$</span>
+              <span class="amount">{{ product.price | number:'1.2-2' }}</span>
+            </div>
+          </div>
+          
+          <p class="product-description" [title]="product.description">
+            {{ getDescriptionPreview(product.description) }}
+          </p>
+          
+          <div class="product-actions">
+            <button class="btn btn-primary add-to-cart" (click)="addToCart(product)">
+              <span class="btn-icon">🛒</span>
+              Add to Cart
+            </button>
+            <button class="btn btn-secondary view-details" (click)="viewProduct(product)">
+              <span class="btn-icon">👁️</span>
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && filteredProducts.length === 0">
+      <div class="empty-icon">
+        <span *ngIf="searchTerm">🔍</span>
+        <span *ngIf="!searchTerm">📦</span>
+      </div>
+      <h3 *ngIf="searchTerm">No products found</h3>
+      <h3 *ngIf="!searchTerm">No products available</h3>
+      <p *ngIf="searchTerm">
+        Try adjusting your search term or 
+        <button class="link-btn" (click)="clearSearch()">browse all products</button>
+      </p>
+      <p *ngIf="!searchTerm">Check back later for new arrivals!</p>
+    </div>
+  </section>
+
+  <div class="cart-summary" *ngIf="cartItems.length > 0">
+    <div class="cart-content">
+      <div class="cart-info">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-count">{{ cartItems.length }} items in cart</span>
+      </div>
+      <div class="cart-total">
+        <span class="total-label">Total: </span>
+        <span class="total-amount">${{ getCartTotal() | number:'1.2-2' }}</span>
+      </div>
+      <button class="btn btn-success view-cart" (click)="viewCart()">
+        View Cart
+      </button>
+    </div>
+  </div>
+</div>
+

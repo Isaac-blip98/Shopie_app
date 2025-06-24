@@ -25,13 +25,13 @@ model Product {
   name        String
   description String
   price       Float
-  image       String
+  image       String?
   quantity    Int
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   adminId     String
   cartItems   CartItem[]
-  admin       User       @relation("ProductCreator", fields: [adminId], references: [id])
+  admin       User       @relation("ProductCreator", fields: [adminId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model Cart {
@@ -50,7 +50,7 @@ model CartItem {
   quantity  Int
   addedAt   DateTime @default(now())
   cart      Cart     @relation(fields: [cartId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {

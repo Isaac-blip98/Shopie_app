@@ -2,8 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { ProductService } from '../../shared/services/product.service';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService }    from '../../shared/services/auth.service';
+import { CartService }    from '../../shared/services/cart.service';
+
+import { Observable, combineLatest, map } from 'rxjs';
 
 @Component({
   selector: 'app-shop',
@@ -13,158 +17,101 @@ import { AuthService } from '../../shared/services/auth.service';
   styleUrls: ['./shop.component.css'],
 })
 export class ShopComponent implements OnInit {
-  userName: string = 'Customer';
-  userInitial: string = 'C';
+  userName    = 'Customer';
+  userInitial = 'C';
 
   products: any[] = [];
   filteredProducts: any[] = [];
-  cartItems: any[] = [];
-
-  searchTerm: string = '';
-  sortBy: string = 'name';
+  searchTerm = '';
+  sortBy: 'name' | 'price-low' | 'price-high' | 'newest' = 'name';
   viewMode: 'grid' | 'list' = 'grid';
-  isLoading: boolean = true;
+  isLoading = true;
+
+  cart$!: Observable<{ count: number; total: number }>;
 
   constructor(
     private productService: ProductService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+    private authService:    AuthService,
+    private cart:           CartService,
+    private router:         Router,
+  ) {
+
+    this.cart$ = combineLatest([this.cart.count$, this.cart.subtotal$]).pipe(
+      map(([count, total]) => ({ count, total })),
+    );
+  }
 
   ngOnInit(): void {
-    const user = this.authService.getCurrentUser();
+    const user = this.authService.getCurrentUser?.();
     if (user?.name) {
-      this.userName = user.name;
+      this.userName   = user.name;
+      this.userInitial = user.name[0]?.toUpperCase() ?? 'C';
     }
     this.loadProducts();
-    this.loadCartItems();
   }
 
   loadProducts(): void {
     this.isLoading = true;
     this.productService.getAll().subscribe({
       next: (data) => {
-        this.products = data.map((product) => ({
-          ...product,
-          createdAt: product.createdAt || new Date(),
+        this.products = data.map((p: any) => ({
+          ...p,
+          createdAt: p.createdAt || new Date(),
         }));
         this.filteredProducts = [...this.products];
         this.onSort();
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Error loading products:', error);
-        this.isLoading = false;
-
+      error: (err) => {
+        console.error('Error loading products:', err);
         this.filteredProducts = [...this.products];
+        this.isLoading = false;
       },
     });
   }
 
-  loadCartItems(): void {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      this.cartItems = JSON.parse(savedCart);
-    }
-  }
+  isNewProduct = (p: any) =>
+    (Date.now() - new Date(p.createdAt).getTime()) / 8.64e7 < 7; 
+  isOut       = (p: any) => p.quantity === 0;
+  trackByProduct = (_: number, p: any) => p.id;
+  getDescriptionPreview = (d = '') => (d.length > 80 ? d.slice(0, 80) + '…' : d);
+  setViewMode = (m: 'grid' | 'list') => (this.viewMode = m);
 
-  onSearch(): void {
-    this.filterProducts();
-  }
-
-  onSort(): void {
-    switch (this.sortBy) {
-      case 'name':
-        this.filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'price-low':
-        this.filteredProducts.sort(
-          (a, b) => parseFloat(a.price) - parseFloat(b.price)
-        );
-        break;
-      case 'price-high':
-        this.filteredProducts.sort(
-          (a, b) => parseFloat(b.price) - parseFloat(a.price)
-        );
-        break;
-      case 'newest':
-        this.filteredProducts.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        break;
-    }
-  }
+  onSearch()       { this.filterProducts(); }
+  clearSearch()    { this.searchTerm = ''; this.filterProducts(); }
+  clearAllFilters(){ this.searchTerm = ''; this.sortBy = 'name'; this.filterProducts(); }
 
   filterProducts(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredProducts = [...this.products];
-    } else {
-      const searchLower = this.searchTerm.toLowerCase();
-      this.filteredProducts = this.products.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchLower) ||
-          (product.description &&
-            product.description.toLowerCase().includes(searchLower))
-      );
-    }
+    const term = this.searchTerm.trim().toLowerCase();
+    this.filteredProducts = term
+      ? this.products.filter(
+          (p) =>
+            p.name.toLowerCase().includes(term) ||
+            p.description?.toLowerCase().includes(term),
+        )
+      : [...this.products];
     this.onSort();
   }
 
-  clearSearch(): void {
-    this.searchTerm = '';
-    this.filterProducts();
+  onSort(): void {
+    const sortFn: Record<string, (a: any, b: any) => number> = {
+      name:        (a, b) => a.name.localeCompare(b.name),
+      'price-low':  (a, b) => +a.price - +b.price,
+      'price-high': (a, b) => +b.price - +a.price,
+      newest:      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    };
+    this.filteredProducts.sort(sortFn[this.sortBy]);
   }
 
-  clearAllFilters(): void {
-    this.searchTerm = '';
-    this.sortBy = 'name';
-    this.filterProducts();
+  addToCart(product: any) {
+    if (this.isOut(product)) return;
+    this.cart.addToCart(product.id).subscribe();
   }
+  viewCart() { this.router.navigate(['/cart']); }
 
-  setViewMode(mode: 'grid' | 'list'): void {
-    this.viewMode = mode;
-  }
-
-  trackByProduct(index: number, product: any): any {
-    return product.id;
-  }
-
-  isNewProduct(product: any): boolean {
-    const createdAt = new Date(product.createdAt);
-    const now = new Date();
-    const diffDays = (now.getTime() - createdAt.getTime()) / (1000 * 3600 * 24);
-    return diffDays < 7;
-  }
-
-  getDescriptionPreview(description: string): string {
-    if (!description) return '';
-    return description.length > 80
-      ? description.slice(0, 80) + '...'
-      : description;
-  }
-
-  addToCart(product: any): void {
-    this.cartItems.push(product);
-    localStorage.setItem('cart', JSON.stringify(this.cartItems));
-  }
-
-  viewProduct(product: any): void {
-    this.router.navigate(['/shop/product', product.id]);
-  }
-
-  getCartTotal(): number {
-    return this.cartItems.reduce(
-      (total, item) => total + parseFloat(item.price),
-      0
-    );
-  }
-
-  viewCart(): void {
-    this.router.navigate(['/cart']);
-  }
-
-  logout(): void {
+  viewProduct(p: any) { this.router.navigate(['/shop/product', p.id]); }
+  logout() {
     this.authService.logout?.();
     localStorage.removeItem('access_token');
     this.router.navigate(['/auth/login']);

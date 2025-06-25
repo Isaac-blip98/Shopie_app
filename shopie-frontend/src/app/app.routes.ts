@@ -22,7 +22,11 @@ export const routes: Routes = [
     import('./auth/reset-password/reset-password.component').then(
       (m) => m.ResetPasswordComponent
     ),
+},
+{
+  path: 'cart',
+  loadComponent: () =>
+    import('./shop/cart/cart.component').then((m) => m.CartComponent),
 }
-
 
 ];

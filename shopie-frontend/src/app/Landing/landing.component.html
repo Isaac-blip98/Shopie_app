@@ -1,0 +1,81 @@
+<div class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+
+
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold tracking-wide text-yellow-500">Shopie</h1>
+
+      <div class="space-x-4">
+        <button
+          class="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded hover:bg-gray-800"
+          (click)="goLogin()">Login</button>
+
+        <button
+          class="px-4 py-2 text-sm font-medium bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          (click)="goRegister()">Register</button>
+      </div>
+    </div>
+  </header>
+
+
+  <section class="bg-white ">
+    <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-4 md:flex-row md:items-end">
+
+
+      <div class="flex-1 relative">
+        <input
+          type="text"
+          placeholder="Search products…"
+          [(ngModel)]="term"
+          (input)="applyFilters()"
+          class="w-full pl-10 pr-4 py-2 text-sm border rounded focus:ring-2 focus:ring-yellow-400 outline-none" />
+        <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+      </div>
+
+      <div class="flex gap-3">
+        <input type="number" placeholder="Min $" class="w-24 px-2 py-1 border rounded text-sm"
+               [(ngModel)]="minPrice" (input)="applyFilters()" />
+        <input type="number" placeholder="Max $" class="w-24 px-2 py-1 border rounded text-sm"
+               [(ngModel)]="maxPrice" (input)="applyFilters()" />
+      </div>
+
+      <button
+        class="text-sm text-yellow-600 hover:underline"
+        (click)="clearAll()">Clear filters</button>
+    </div>
+  </section>
+
+
+  <main class="flex-1 max-w-7xl mx-auto px-6 py-10">
+    <h2 class="text-xl font-semibold mb-6">Our Latest Products</h2>
+
+
+    <div *ngIf="isLoading" class="text-center text-gray-500">Loading …</div>
+
+
+    <div *ngIf="!isLoading" class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div *ngFor="let p of filtered" class="bg-white rounded-lg shadow hover:shadow-md transition">
+        <img [src]="p.image" (error)="imgFallback($event)"
+             class="w-full h-48 object-cover rounded-t-lg" alt="product image" />
+
+        <div class="p-4 space-y-2">
+          <h3 class="text-lg font-bold truncate">{{ p.name }}</h3>
+          <p class="text-sm text-gray-500 h-10 overflow-hidden">{{ p.description }}</p>
+          <div class="text-yellow-600 font-semibold text-lg">${{ p.price | number:'1.2-2' }}</div>
+        </div>
+      </div>
+
+
+      <div *ngIf="!filtered.length" class="col-span-full text-center text-gray-500 py-12">
+        <p>No products match your criteria.</p>
+      </div>
+    </div>
+  </main>
+
+
+  <footer class="bg-gray-100">
+    <div class="max-w-7xl mx-auto px-6 py-6 text-center text-sm text-gray-600">
+      © {{ today | date:'yyyy' }} Shopie — All rights reserved.
+    </div>
+  </footer>
+</div>

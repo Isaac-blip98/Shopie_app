@@ -1,52 +1,74 @@
-<div class="min-h-screen bg-gray-50 dark:bg-white-900 text-gray-800 dark:text-gray-100">
-
-  <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center">
+<div
+  class="min-h-screen bg-gray-50 dark:bg-white-900 text-gray-800 dark:text-gray-100"
+>
+  <header
+    class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center"
+  >
     <div>
       <h1 class="text-2xl font-bold text-yellow-500 tracking-wide">Shopie</h1>
-      <p class="text-sm text-gray-700">Discover amazing products just for you!</p>
+      <p class="text-sm text-gray-700">
+        Discover amazing products just for you!
+      </p>
     </div>
 
     <div class="flex items-center gap-5">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-yellow-400 text-white flex items-center justify-center font-semibold uppercase shadow">
+        <div
+          class="w-10 h-10 rounded-full bg-yellow-400 text-white flex items-center justify-center font-semibold uppercase shadow"
+        >
           {{ userInitial }}
         </div>
         <div class="leading-tight">
-          <div class="text-sm font-medium text-gray-800">Welcome back! {{ userName }}</div>
+          <div class="text-sm font-medium text-gray-800">
+            Welcome back! {{ userName }}
+          </div>
           <div class="text-xs text-gray-500">Customer&nbsp;Dashboard</div>
         </div>
       </div>
 
-      <button type="button"
-              (click)="logout()"
-              class="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-700 transition text-sm font-medium">
+      <button
+        type="button"
+        (click)="logout()"
+        class="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-700 transition text-sm font-medium"
+      >
         Logout
       </button>
     </div>
   </header>
 
   <section class="bg-white text-gray-800 p-6 space-y-4">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div class="flex flex-1 relative">
-        <input type="text"
-               placeholder="Search products..."
-               [(ngModel)]="searchTerm"
-               (input)="onSearch()"
-               class="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-yellow-400 outline-none" />
+        <input
+          type="text"
+          placeholder="Search products..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          class="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
+        />
         <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
-        <button *ngIf="searchTerm"
-                (click)="clearSearch()"
-                class="absolute right-3 top-2.5 text-gray-500 hover:text-red-500"
-                title="Clear search">✕</button>
+        <button
+          *ngIf="searchTerm"
+          (click)="clearSearch()"
+          class="absolute right-3 top-2.5 text-gray-500 hover:text-red-500"
+          title="Clear search"
+        >
+          ✕
+        </button>
       </div>
 
       <div class="flex items-center gap-4">
-        <label for="sortBy" class="text-sm font-medium text-gray-700">Sort by:</label>
-        <select id="sortBy"
-                [(ngModel)]="sortBy"
-                (change)="onSort()"
-                class="border border-gray-300 rounded-md px-2 py-1 text-sm">
+        <label for="sortBy" class="text-sm font-medium text-gray-700"
+          >Sort by:</label
+        >
+        <select
+          id="sortBy"
+          [(ngModel)]="sortBy"
+          (change)="onSort()"
+          class="border border-gray-300 rounded-md px-2 py-1 text-sm"
+        >
           <option value="name">Name</option>
           <option value="price-low">Price: Low to High</option>
           <option value="price-high">Price: High to Low</option>
@@ -54,104 +76,168 @@
         </select>
 
         <div class="flex gap-1">
-          <button class="px-3 py-1 border rounded-md text-sm"
-                  [ngClass]="{ 'bg-yellow-400 text-white': viewMode === 'grid', 'border-gray-300 text-gray-700': viewMode !== 'grid' }"
-                  (click)="setViewMode('grid')" title="Grid View">⊞</button>
-          <button class="px-3 py-1 border rounded-md text-sm"
-                  [ngClass]="{ 'bg-yellow-400 text-white': viewMode === 'list', 'border-gray-300 text-gray-700': viewMode !== 'list' }"
-                  (click)="setViewMode('list')" title="List View">☰</button>
+          <button
+            class="px-3 py-1 border rounded-md text-sm"
+            [ngClass]="{
+              'bg-yellow-400 text-white': viewMode === 'grid',
+              'border-gray-300 text-gray-700': viewMode !== 'grid'
+            }"
+            (click)="setViewMode('grid')"
+            title="Grid View"
+          >
+            ⊞
+          </button>
+          <button
+            class="px-3 py-1 border rounded-md text-sm"
+            [ngClass]="{
+              'bg-yellow-400 text-white': viewMode === 'list',
+              'border-gray-300 text-gray-700': viewMode !== 'list'
+            }"
+            (click)="setViewMode('list')"
+            title="List View"
+          >
+            ☰
+          </button>
         </div>
       </div>
     </div>
 
-    <div *ngIf="searchTerm || filteredProducts.length !== products.length"
-         class="text-sm flex justify-between text-gray-600">
+    <div
+      *ngIf="searchTerm || filteredProducts.length !== products.length"
+      class="text-sm flex justify-between text-gray-600"
+    >
       <span>
         Showing {{ filteredProducts.length }} of {{ products.length }}
         <span *ngIf="searchTerm">for "{{ searchTerm }}"</span>
       </span>
-      <button *ngIf="searchTerm"
-              (click)="clearAllFilters()"
-              class="text-yellow-600 hover:underline">Clear all filters</button>
+      <button
+        *ngIf="searchTerm"
+        (click)="clearAllFilters()"
+        class="text-yellow-600 hover:underline"
+      >
+        Clear all filters
+      </button>
     </div>
   </section>
 
-  <section class="px-6 pb-20 mt-10 ">
-
-    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-10">
-      <div class="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full"></div>
-      <p class="mt-2 text-gray-600 dark:text-gray-300">Loading amazing products...</p>
+  <section class="px-6 pb-20 mt-10">
+    <div
+      *ngIf="isLoading"
+      class="flex flex-col items-center justify-center py-10"
+    >
+      <div
+        class="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full"
+      ></div>
+      <p class="mt-2 text-gray-600 dark:text-gray-300">
+        Loading amazing products...
+      </p>
     </div>
 
-    <div *ngIf="!isLoading && filteredProducts.length > 0"
-         [ngClass]="{
-           'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6': viewMode === 'grid',
-           'flex flex-col gap-4': viewMode === 'list'
-         }">
+    <div
+      *ngIf="!isLoading && filteredProducts.length > 0"
+      [ngClass]="{
+        'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6':
+          viewMode === 'grid',
+        'flex flex-col gap-4': viewMode === 'list'
+      }"
+    >
+      <div
+        *ngFor="let product of filteredProducts; trackBy: trackByProduct"
+        class="bg-white rounded-lg shadow hover:shadow-md transition relative"
+      >
+        <img
+          [src]="product.image || 'https://placehold.co/400x250?text=No+Image'"
+          alt="Product image"
+          class="w-full h-48 object-cover rounded-t-lg"
+        />
 
-      <div *ngFor="let product of filteredProducts; trackBy: trackByProduct"
-           class="bg-white border rounded-lg shadow-md p-4 relative">
+        <div class="p-4 space-y-2">
+          <h3 class="text-lg font-bold truncate">{{ product.name }}</h3>
+          <p class="text-sm text-gray-500 h-10 overflow-hidden">
+            {{ getDescriptionPreview(product.description) }}
+          </p>
 
-        <div class="mb-3">
-          <img [src]="product.image || 'https://placehold.co/400x250?text=No+Image'"
-               alt="Product image"
-               class="w-full h-40 object-cover rounded">
+          <div class="flex justify-between items-center pt-1">
+            <span class="text-yellow-600 font-semibold text-lg">
+              ${{ product.price | number : "1.2-2" }}
+            </span>
+
+            <span
+              *ngIf="isOut(product)"
+              class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full"
+            >
+              Out&nbsp;of&nbsp;stock
+            </span>
+            <span *ngIf="!isOut(product)" class="text-xs text-gray-400">
+              Stock: {{ product.quantity }}
+            </span>
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <button
+              class="flex-1 py-2 px-4 rounded-md text-sm font-medium bg-yellow-400 text-gray-900 hover:bg-yellow-500 disabled:opacity-50"
+              (click)="addToCart(product)"
+              [disabled]="isOut(product)"
+            >
+              🛒 Add to Cart
+            </button>
+
+            <button
+              class="flex-1 py-2 px-4 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-gray-800"
+              (click)="viewProduct(product)"
+            >
+              View
+            </button>
+          </div>
         </div>
 
-        <h3 class="text-lg font-semibold truncate text-gray-500 ">{{ product.name }}</h3>
-        <p class="text-sm text-gray-500 truncate">{{ getDescriptionPreview(product.description) }}</p>
-
-        <div class="flex justify-between items-center mt-2">
-          <span class="text-xl font-bold text-yellow-500">${{ product.price | number:'1.2-2' }}</span>
-          <span *ngIf="isOut(product)" class="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full">Out&nbsp;of&nbsp;stock</span>
-          <span *ngIf="!isOut(product)" class="text-xs text-gray-400">Stock: {{ product.quantity }}</span>
-        </div>
-
-        <div class="mt-4 flex gap-2">
-          <button class="flex-1 py-1 px-4 rounded text-sm font-medium
-                         bg-yellow-400 text-gray-900 hover:bg-yellow-500 disabled:opacity-50"
-                  (click)="addToCart(product)" [disabled]="isOut(product)">
-            🛒 Add to Cart
-          </button>
-          <button class="flex-1 py-1 px-4 rounded text-sm bg-gray-900 text-white hover:bg-gray-800"
-                  (click)="viewProduct(product)">
-            View
-          </button>
-        </div>
-
-        <div *ngIf="isNewProduct(product)"
-             class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+        <div
+          *ngIf="isNewProduct(product)"
+          class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow"
+        >
           New
         </div>
       </div>
     </div>
 
-    <div *ngIf="!isLoading && filteredProducts.length === 0"
-         class="text-center py-10 text-gray-500">
-      <div class="text-4xl mb-4">{{ searchTerm ? '🔍' : '📦' }}</div>
+    <div
+      *ngIf="!isLoading && filteredProducts.length === 0"
+      class="text-center py-10 text-gray-500"
+    >
+      <div class="text-4xl mb-4">{{ searchTerm ? "🔍" : "📦" }}</div>
       <h3 class="text-lg font-medium">
-        {{ searchTerm ? 'No products found' : 'No products available' }}
+        {{ searchTerm ? "No products found" : "No products available" }}
       </h3>
       <p *ngIf="searchTerm">
         Try adjusting your search or
-        <button class="text-yellow-500 hover:underline" (click)="clearSearch()">browse all products</button>
+        <button class="text-yellow-500 hover:underline" (click)="clearSearch()">
+          browse all products
+        </button>
       </p>
       <p *ngIf="!searchTerm">Check back later for new arrivals!</p>
     </div>
   </section>
 
-<ng-container *ngIf="cart$ | async as cart">
-  <div *ngIf="cart.count"
-       class="fixed bottom-0 inset-x-0 bg-white dark:bg-gray-800 shadow-md px-6 py-4 flex justify-between items-center">
-    <div class="flex gap-2 items-center">
-      <span>🛒</span>
-      <span>{{ cart.count }} item{{ cart.count > 1 ? 's' : '' }}</span>
+  <ng-container *ngIf="cart$ | async as cart">
+    <div
+      *ngIf="cart.count"
+      class="fixed bottom-0 inset-x-0 bg-white dark:bg-gray-800 shadow-md px-6 py-4 flex justify-between items-center"
+    >
+      <div class="flex gap-2 items-center">
+        <span>🛒</span>
+        <span>{{ cart.count }} item{{ cart.count > 1 ? "s" : "" }}</span>
+      </div>
+
+      <div class="text-lg font-bold">
+        Total: ${{ cart.total | number : "1.2-2" }}
+      </div>
+
+      <button
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        (click)="viewCart()"
+      >
+        View Cart
+      </button>
     </div>
-
-    <div class="text-lg font-bold">Total: ${{ cart.total | number:'1.2-2' }}</div>
-
-    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            (click)="viewCart()">View Cart</button>
-  </div>
-</ng-container>
+  </ng-container>
 </div>
